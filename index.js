@@ -4,7 +4,7 @@ const cookieParser = require('cookie-parser')
 const config = require('./server/config/key');
 const {auth} = require("./server/middleware/auth");
 const app = express();
-const port = 5000;
+
 
 // Content-Type: application/x-www-form-urlencoded
 app.use(express.urlencoded({extended: true}));
@@ -25,6 +25,10 @@ mongoose.connect(config.mongoURI, {
 app.get('/', (req, res) => {
     res.send('Hello World!')
 })
+
+app.get('/api/hello', (req, res) => {
+    res.send("axios 테스트 해봅니다~백엔드에서 서버보냅니다~");
+});
 
 app.post('/api/users/register', (req, res) => {
     // 회원가입할 때 필요한 정보를 Client에서 가져와서
@@ -89,6 +93,7 @@ app.get('/api/users/logout', auth, (req, res) => {
 
 });
 
+const port = 5000;
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })

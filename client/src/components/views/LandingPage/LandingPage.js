@@ -1,9 +1,14 @@
-import React from 'react';
+import React, {useEffect} from 'react';
+import axios from "axios";
 
 function LandingPage(props) {
+    useEffect(() => {
+        axios.get('/api/hello')
+            .then(response => console.log(response.data));
+    }, []);
     return (
         <div>
-            LandingPage
+            <h1>LandingPage</h1>
         </div>
     );
 }
