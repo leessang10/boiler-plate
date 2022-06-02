@@ -1,7 +1,8 @@
 const express = require('express');
-const {User} = require('./models/User');
+const {User} = require('./server/models/User');
 const cookieParser = require('cookie-parser')
-const config = require('./config/key');
+const config = require('./server/config/key');
+const {auth} = require("./server/middleware/auth");
 const app = express();
 const port = 3000;
 
@@ -12,9 +13,9 @@ app.use(express.json());
 
 app.use(cookieParser());
 
-
 // mongoDB 연결
 const mongoose = require('mongoose');
+
 mongoose.connect(config.mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -25,7 +26,7 @@ app.get('/', (req, res) => {
     res.send('Hello World!')
 })
 
-app.post('/register', (req, res) => {
+app.post('/api/users/register', (req, res) => {
     // 회원가입할 때 필요한 정보를 Client에서 가져와서
     const user = new User(req.body);
     user.save((err, userInfo) => {
@@ -36,7 +37,7 @@ app.post('/register', (req, res) => {
     });
 });
 
-app.post('/login', (req, res) => {
+app.post('/api/users/login', (req, res) => {
     // 요청된 이메일을 DB에서 조회
     User.findOne({email: req.body.email}, (err, user) => {
         if (!user) {
@@ -53,7 +54,7 @@ app.post('/login', (req, res) => {
             // 비밀번호가 맞는 경우, Token 생성
             user.generateToken((err, user) => {
                 if (err) return res.status(400).send(err);
-                
+
                 // token을 쿠키에 저장한다.
                 res.cookie("x_auth", user.token)
                     .status(200)
@@ -62,6 +63,32 @@ app.post('/login', (req, res) => {
         });
     });
 });
+
+app.get('/api/users/auth', auth, (req, res) => {
+    res.status(200).json({
+        _id: req.user._id,
+        isAdmin: req.user.role === 0,
+        isAuth: true,
+        email: req.user.email,
+        name: req.user.name,
+        lastname: req.user.lastname,
+        image: req.user.image
+    });
+});
+
+app.get('/api/users/logout', auth, (req, res) => {
+    User.findOneAndUpdate({_id: req.user._id},
+        {token: ""},
+        (err, user) => {
+            if (err) return res.json({success: false, err});
+            return res.status(200).send({
+                success: true
+            });
+        }
+    );
+
+});
+
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })

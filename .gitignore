@@ -119,4 +119,4 @@ dist
 .pnp.*
 
 # security
-/config/dev.js
+/server/config/dev.js
