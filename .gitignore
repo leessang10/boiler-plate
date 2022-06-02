@@ -120,3 +120,4 @@ dist
 
 # security
 /server/config/dev.js
+!/client/src/Config.js

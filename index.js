@@ -4,7 +4,7 @@ const cookieParser = require('cookie-parser')
 const config = require('./server/config/key');
 const {auth} = require("./server/middleware/auth");
 const app = express();
-const port = 3000;
+const port = 5000;
 
 // Content-Type: application/x-www-form-urlencoded
 app.use(express.urlencoded({extended: true}));
